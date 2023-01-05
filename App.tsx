@@ -1,120 +1,65 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React, {type PropsWithChildren} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
-  StyleSheet,
+  TouchableOpacity,
   Text,
-  useColorScheme,
+  ScrollView,
   View,
 } from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<
-  PropsWithChildren<{
-    title: string;
-  }>
-> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+import {SignatureView} from 'react-native-signature-capture-view';
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+  const signatureRef = useRef(null);
+  const [text, setText] = useState('');
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
+    <>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={{flex: 1}}>
+        <SignatureView
           style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+            borderWidth: 2,
+            height: 200,
+          }}
+          ref={signatureRef}
+          // onSave is automatically called whenever signature-pad onEnd is called and saveSignature is called
+          onSave={val => {
+            //  a base64 encoded image
+            console.log('saved signature');
+            console.log(val);
+            setText(val);
+          }}
+          onClear={() => {
+            console.log('cleared signature');
+            setText('');
+          }}
+        />
+        <View
+          style={{flexDirection: 'row', justifyContent: 'center', height: 50}}>
+          <TouchableOpacity
+            style={{justifyContent: 'center', alignItems: 'center', flex: 1}}
+            onPress={() => {
+              signatureRef.current.clearSignature();
+            }}>
+            <Text>Clear</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{justifyContent: 'center', alignItems: 'center', flex: 1}}
+            onPress={() => {
+              signatureRef.current.saveSignature();
+            }}>
+            <Text>Save</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <ScrollView style={{flex: 1, margin: 20}}>
+          <Text numberOfLines={10} ellipsizeMode="tail">
+            {text}
+          </Text>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
